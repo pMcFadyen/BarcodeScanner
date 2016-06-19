@@ -21,15 +21,15 @@ public class MainActivity extends AppCompatActivity {
         //{"0", "1"}
         final ArrayList<String> list = new ArrayList<>();
         final ArrayList<String> list_id = new ArrayList<>();
-        String[] temp = {"0", "1"};
-        String[] temp_id = {"jack", "jill"};
+        String[] temp = {"jack", "jill"};
+        String[] temp_id = {"0", "1"};
         for (int i = 0; i < temp.length; ++i) {
             list.add(temp[i]);
             list_id.add(temp_id[i]);
         }
         HoldValues g = (HoldValues)getApplication();
-        g.setCampers(list);
-        g.setCampersId(list_id);
+        //g.setCampers(list);
+        //g.setCampersId(list_id);
         g.reset();
         //Toast.makeText(this, "button", Toast.LENGTH_SHORT).show();
         Intent i = new Intent(this, Scanner.class);

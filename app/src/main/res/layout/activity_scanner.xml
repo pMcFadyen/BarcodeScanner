@@ -32,7 +32,9 @@
         android:layout_height="428dp"
         android:id="@+id/listView"
         android:layout_gravity="center_horizontal|bottom"
-        android:nestedScrollingEnabled="false" />
+        android:nestedScrollingEnabled="false"
+        android:clickable="false"
+        android:contextClickable="false" />
 
 
 

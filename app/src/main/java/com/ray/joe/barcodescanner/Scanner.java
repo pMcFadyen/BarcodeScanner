@@ -1,11 +1,19 @@
 package com.ray.joe.barcodescanner;
 
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.google.android.gms.appindexing.Action;
@@ -19,6 +27,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,59 +44,82 @@ import com.google.zxing.integration.android.IntentResult;
 //import com.google.zxing.ResultPoint;
 
 public class Scanner extends AppCompatActivity {
-    /*private static final String TAG = ContinuousCaptureActivity.class.getSimpleName();
-    private DecoratedBarcodeView barcodeView;
-
-    private BarcodeCallback callback = new BarcodeCallback() {
-        @Override
-        public void barcodeResult(BarcodeResult result) {
-            if (result.getText() != null) {
-                barcodeView.setStatusText(result.getText());
-            }
-            //Added preview of scanned barcode
-            //ImageView imageView = (ImageView) findViewById(R.id.barcodePreview);
-            //imageView.setImageBitmap(result.getBitmapWithResultPoints(Color.YELLOW));
-        }
-
-        @Override
-        public void possibleResultPoints(List<ResultPoint> resultPoints) {
-        }
-    };*/
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client;
+    final PopupWindow popup = new PopupWindow();
     ArrayAdapter<String> adapter;
+    ArrayAdapter<String> adapter2;
     final ArrayList<String> list = new ArrayList<>();
     ListView lv;
     IntentIntegrator integrator = new IntentIntegrator(this);
     public String[] values;
+    HoldValues g;
+    Button b;
+    int tempPosition =0;
+    String tempString="";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scanner);
         lv = (ListView)findViewById(R.id.listView);
-        values = new String[]{"0", "1"};
-        HoldValues g = (HoldValues)getApplication();
-        //Toast.makeText(this, ("stuff: " + g.getCampersString()), Toast.LENGTH_SHORT).show();
-        //Below is the correct list---- Still need to get writers camp numbers and names
-        //{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54"}
-        for (int i = 0; i < values.length; ++i) {
-            list.add(values[i]);
-        }
-        //g.setCampers(list);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
+        values=  new String[]{"All Campers Accounted for!"};
+        list.add(values[0]);
+        adapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
+        g = (HoldValues)getApplication();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, g.getMissing());
         lv.setAdapter(adapter);
+        b = (Button)findViewById(R.id.button3);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View v, int position, long id) {
+                showPopup(position);
+                //Toast.makeText(getApplicationContext(), Integer.toString(position), Toast.LENGTH_LONG).show();
+            }
+        });
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
-        //barcodeView = (DecoratedBarcodeView) findViewById(R.id.barcode_scanner);
-        //barcodeView.decodeContinuous(callback);
+    }
+
+    public void showPopup(int positionText){
+        tempPosition = positionText;
+        tempString = g.getMissingFromID(positionText);
+        LinearLayout viewGroup = (LinearLayout) findViewById(R.id.popup);
+        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View layout = layoutInflater.inflate(R.layout.continuous_scan, viewGroup);
+        //final PopupWindow popup = new PopupWindow();
+        popup.setContentView(layout);
+        popup.setFocusable(true);
+        popup.setWidth(400);
+        popup.setHeight(300);
+        popup.setBackgroundDrawable(new BitmapDrawable());
+        ((TextView)popup.getContentView().findViewById(R.id.popupText)).setText("Mark " + g.getMissingFromID(positionText) + " as accounted for?");
+        popup.showAtLocation(layout, Gravity.CENTER, 0,0);
+
+    }
+
+    public void popupRemove(View v){
+        popup.dismiss();
+        g.removeMissingPopup(tempString);
+        adapter.notifyDataSetChanged();
+        lv.setAdapter(adapter);
+        if(g.getMissingSize() == 0) {
+            FrameLayout fl = (FrameLayout)findViewById(R.id.fl);
+            fl.setBackgroundColor(0xff00ff00);
+            adapter = adapter2;
+            adapter.notifyDataSetChanged();
+            lv.setAdapter(adapter);
+            Toast.makeText(this, "All Campers Accounted for!", Toast.LENGTH_LONG).show();
+            b.setEnabled(false);
+        }
     }
 
     @Override
@@ -96,9 +130,10 @@ public class Scanner extends AppCompatActivity {
                 Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
             }
             else {
-                if(list.indexOf(result.getContents()) >= 0) {
-                    if (list.size() > 1) {
-                        list.remove(list.indexOf(result.getContents()));
+                if(g.getMissing_idIndex(result.getContents()) >= 0) {
+                    if (g.getMissingSize() > 1) {
+                        g.removeMissing(result.getContents());
+                        //list.remove(list.indexOf(result.getContents()));
                         adapter.notifyDataSetChanged();
                         lv.setAdapter(adapter);
                         Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
@@ -106,11 +141,11 @@ public class Scanner extends AppCompatActivity {
                     } else {
                         FrameLayout fl = (FrameLayout)findViewById(R.id.fl);
                         fl.setBackgroundColor(0xff00ff00);
-                        list.add("All Campers Accounted for!");
-                        list.remove(list.indexOf(result.getContents()));
+                        adapter = adapter2;
                         adapter.notifyDataSetChanged();
                         lv.setAdapter(adapter);
                         Toast.makeText(this, "All Campers Accounted for!", Toast.LENGTH_LONG).show();
+                        b.setEnabled(false);
                     }
                 }
                 else{
@@ -124,21 +159,14 @@ public class Scanner extends AppCompatActivity {
     }
 
     public void clickOnList(View v){
-        //setContentView(R.layout.continuous_scan);
         integrator.initiateScan();
-        //barcodeView = (CompoundBarcodeView) findViewById(R.id.barcode_scanner);
-        //barcodeView.decodeContinuous(callback);
-
     }
     public void clickOnReset(View v){
-        list.clear();
-        for (int i = 0; i < values.length; ++i) {
-            list.add(values[i]);
-        }
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
+        g.reset();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, g.getMissing());
         lv.setAdapter(adapter);
         FrameLayout fl = (FrameLayout)findViewById(R.id.fl);
         fl.setBackgroundColor(0xffffffff);
+        b.setEnabled(true);
     }
-
 }
