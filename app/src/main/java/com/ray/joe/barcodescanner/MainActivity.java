@@ -9,30 +9,24 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+//{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54"}
+//{"0", "1"}
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
-    public void startScan(View v){
-        //{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54"}
-        //{"0", "1"}
-        final ArrayList<String> list = new ArrayList<>();
-        final ArrayList<String> list_id = new ArrayList<>();
-        String[] temp = {"jack", "jill"};
-        String[] temp_id = {"0", "1"};
-        for (int i = 0; i < temp.length; ++i) {
-            list.add(temp[i]);
-            list_id.add(temp_id[i]);
-        }
         HoldValues g = (HoldValues)getApplication();
-        //g.setCampers(list);
-        //g.setCampersId(list_id);
         g.reset();
-        //Toast.makeText(this, "button", Toast.LENGTH_SHORT).show();
+    }
+
+    public void startScan(View v){
         Intent i = new Intent(this, Scanner.class);
         this.startActivity(i);
+    }
+
+    public void secret(View v){
+        Toast.makeText(this, "You found the Secret!", Toast.LENGTH_SHORT).show();
     }
 }

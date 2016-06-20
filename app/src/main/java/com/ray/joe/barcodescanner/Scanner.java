@@ -1,9 +1,7 @@
 package com.ray.joe.barcodescanner;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -16,32 +14,18 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-//import com.journeyapps.barcodescanner.BarcodeCallback;
-//import com.journeyapps.barcodescanner.BarcodeResult;
-//import com.journeyapps.barcodescanner.BarcodeView;
-//import com.journeyapps.barcodescanner.CompoundBarcodeView;
-//import com.journeyapps.barcodescanner.DecoratedBarcodeView;
-//import com.google.zxing.ResultPoint;
 
 public class Scanner extends AppCompatActivity {
 
@@ -49,6 +33,7 @@ public class Scanner extends AppCompatActivity {
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
+    //Declarations
     private GoogleApiClient client;
     final PopupWindow popup = new PopupWindow();
     ArrayAdapter<String> adapter;
@@ -78,17 +63,16 @@ public class Scanner extends AppCompatActivity {
         {
             @Override
             public void onItemClick(AdapterView<?> arg0, View v, int position, long id) {
-                showPopup(position);
-                //Toast.makeText(getApplicationContext(), Integer.toString(position), Toast.LENGTH_LONG).show();
+                if(((TextView)v).getText().toString() == "All Campers Accounted for!"){}
+                else{showPopup(position);}
             }
         });
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
-
     }
-
+    //Display Popup to remove items from the ListView
     public void showPopup(int positionText){
         tempPosition = positionText;
         tempString = g.getMissingFromID(positionText);
@@ -103,7 +87,6 @@ public class Scanner extends AppCompatActivity {
         popup.setBackgroundDrawable(new BitmapDrawable());
         ((TextView)popup.getContentView().findViewById(R.id.popupText)).setText("Mark " + g.getMissingFromID(positionText) + " as accounted for?");
         popup.showAtLocation(layout, Gravity.CENTER, 0,0);
-
     }
 
     public void popupRemove(View v){
