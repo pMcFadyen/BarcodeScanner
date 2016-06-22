@@ -5,14 +5,17 @@ import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.nfc.NfcAdapter;
 
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -35,7 +38,7 @@ public class Scanner extends AppCompatActivity {
      */
     //Declarations
     private GoogleApiClient client;
-    final PopupWindow popup = new PopupWindow();
+    PopupWindow popup = new PopupWindow();
     ArrayAdapter<String> adapter;
     ArrayAdapter<String> adapter2;
     final ArrayList<String> list = new ArrayList<>();
@@ -46,6 +49,9 @@ public class Scanner extends AppCompatActivity {
     Button b;
     int tempPosition =0;
     String tempString="";
+    EditText rfid; //= new EditText(findViewById(R.id.editText));
+    String rfidCode="";
+    //private NfcAdapter mNfcAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -72,6 +78,55 @@ public class Scanner extends AppCompatActivity {
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
+
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event){
+        switch(keyCode)
+        {
+            case(KeyEvent.KEYCODE_ENTER):
+                Toast.makeText(getBaseContext(), rfidCode, Toast.LENGTH_SHORT).show();
+                rfidCode = "";
+                return true;
+            case (KeyEvent.KEYCODE_0):
+                rfidCode = rfidCode + "0";
+                return true;
+            case (KeyEvent.KEYCODE_1):
+                rfidCode = rfidCode + "1";
+                return true;
+            case (KeyEvent.KEYCODE_2):
+                rfidCode = rfidCode + "2";
+                return true;
+            case (KeyEvent.KEYCODE_3):
+                rfidCode = rfidCode + "3";
+                return true;
+            case (KeyEvent.KEYCODE_4):
+                rfidCode = rfidCode + "4";
+                return true;
+            case (KeyEvent.KEYCODE_5):
+                rfidCode = rfidCode + "5";
+                return true;
+            case (KeyEvent.KEYCODE_6):
+                rfidCode = rfidCode + "6";
+                return true;
+            case (KeyEvent.KEYCODE_7):
+                rfidCode = rfidCode + "7";
+                return true;
+            case (KeyEvent.KEYCODE_8):
+                rfidCode = rfidCode + "8";
+                return true;
+            case (KeyEvent.KEYCODE_9):
+                rfidCode = rfidCode + "9";
+                return true;
+            case (KeyEvent.KEYCODE_BACK):
+                super.onBackPressed();
+                return false;
+            default:
+                return false;
+        }
+    }
+
     //Display Popup to remove items from the ListView
     public void showPopup(int positionText){
         tempPosition = positionText;
@@ -141,8 +196,20 @@ public class Scanner extends AppCompatActivity {
         }
     }
 
+
+
     public void clickOnList(View v){
-        integrator.initiateScan();
+        PopupWindow popup2 = new PopupWindow();
+        LinearLayout viewGroup2 = (LinearLayout) findViewById(R.id.llrfid);
+        LayoutInflater layoutInflater2 = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View layout = layoutInflater2.inflate(R.layout.activity_rfid_scanning, viewGroup2);
+        //final PopupWindow popup = new PopupWindow();
+        popup2.setContentView(layout);
+        popup2.setFocusable(true);
+        popup2.setWidth(400);
+        popup2.setHeight(300);
+        popup2.setBackgroundDrawable(new BitmapDrawable());
+        popup2.showAtLocation(layout, Gravity.CENTER, 30,30);
     }
     public void clickOnReset(View v){
         g.reset();
